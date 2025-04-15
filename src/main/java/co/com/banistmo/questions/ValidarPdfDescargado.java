@@ -4,33 +4,27 @@ import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;
 import net.serenitybdd.screenplay.abilities.BrowseTheWeb;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
 import java.util.Set;
 
 public class ValidarPdfDescargado implements Question <Boolean>{
     @Override
     public Boolean answeredBy(Actor actor) {
-        /*WebDriver driver = BrowseTheWeb.as(actor).getDriver();
-        String ventanaAntes = driver.getWindowHandle();
-        new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(drv -> drv.getWindowHandles().size() > ventanaAntes.size());
-
+        WebDriver driver = BrowseTheWeb.as(actor).getDriver();
+        Set<String> ventanaAntes = driver.getWindowHandles();
         Set<String> ventanaDespues = driver.getWindowHandles();
-        ventanaDespues.removeAll(ventanaAntes);
-
-
-        for (String ventana : ventanas){
-            if (!ventana.equals(ventanaNueva)){
-                driver.switchTo().window(ventana);
-                break;
-            }
+        try {
+            Thread.sleep(3000); // Espera de 3 segundos para asegurar que la nueva pestaña se haya cargado
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        String urlPdfSeleccionado = driver.getCurrentUrl();
-        driver.switchTo().window(ventanaNueva);
-        return urlPdfSeleccionado.contains("ProhibicionesSuperIntendenciaDeBancosSIB.pdf");*/
-        return null;
+        ventanaDespues.removeAll(ventanaAntes);
+        if (!ventanaDespues.isEmpty()){
+            String ventanaNueva = ventanaDespues.iterator().next();
+            driver.switchTo().window(ventanaNueva);
+            String urlPdfGenerado = driver.getCurrentUrl();
+            return urlPdfGenerado.contains("ProhibicionesSuperIntendenciaDeBancosSIB.pdf");
+        }
+        return false;
     }
 
     public static ValidarPdfDescargado deProhibiciones(){
